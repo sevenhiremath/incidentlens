@@ -1,0 +1,32 @@
+[project]
+name = "incidentlens"
+version = "0.1.0"
+description = "A Python service monitor with incident timelines and editable reports."
+requires-python = ">=3.12,<3.15"
+dependencies = [
+    "Django>=5.2.15,<5.3",
+    "djangorestframework>=3.16,<3.18",
+    "streamlit>=1.50,<2",
+    "pandas>=2.2,<4",
+    "altair>=5,<7",
+    "requests>=2.32.5,<3",
+    "psycopg[binary]>=3.2,<4",
+    "python-dotenv>=1.1,<2",
+    "Flask>=3.1,<4",
+    "gunicorn>=23,<26; sys_platform != 'win32'",
+]
+
+[dependency-groups]
+dev = ["pytest>=8.4,<10", "pytest-django>=4.11,<5", "ruff>=0.12,<1"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
