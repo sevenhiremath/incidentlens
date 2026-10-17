@@ -39,6 +39,8 @@ The CI badge and workflow logs show the current remote result, including the Pos
 
 The [verification run for commit 32e0606](https://github.com/sevenhiremath/incidentlens/actions/runs/39010263300) passed all three jobs: SQLite tests, PostgreSQL tests, and the container walkthrough. The PostgreSQL run includes the three concurrency tests, for a total of 45 passing tests. The container job built the images, applied migrations, started the services, and completed the real HTTP walkthrough.
 
+The follow-up [performance work](performance.md) adds query-budget and benchmark-statistics tests. Its [correctness run](https://github.com/sevenhiremath/incidentlens/actions/runs/39010824323) passed 52 PostgreSQL tests, 49 SQLite tests with three explicit skips, and the Docker walkthrough.
+
 ## Screens from the running app
 
 These are captures from the local SQLite walkthrough, not design mockups.

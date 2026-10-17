@@ -76,3 +76,9 @@ The snapshot does not change when more logs arrive. Build a new draft to include
 I want to add AI only after the incident data is reliable. The plan is to send a bounded evidence snapshot and require structured output with event IDs. The backend would validate the output shape and incident ownership of those IDs. It would still need checks for whether the text is actually supported by the evidence.
 
 There is no model API call, AI evaluation, automatic remediation, or root-cause classifier in v0.1.
+
+## Follow-up: list query performance
+
+The service list now uses a database `Exists` annotation to fetch whether a service has an open incident. The incident list uses a `Count` annotation for linked events. This avoids querying once for each row on a page. The incident query has an explicit detection-time and ID order so pagination remains stable after grouping.
+
+Query-budget tests check both small and larger lists. [The performance notes](performance.md) explain the before/after measurements and include the raw request timings.

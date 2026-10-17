@@ -25,6 +25,12 @@ This screenshot is from the local walkthrough. The service shows stale because t
 
 The dashboard shows **stale** when checks stop arriving. It does not keep showing an old successful check as current health.
 
+## Measured backend performance
+
+With 100 services and 10,000 seeded events, the service-list optimization reduced queries from **29 to 3** and p95 HTTP response time from **144.845 ms to 73.165 ms**. These are medians from three runs with eight clients on one PostgreSQL CI setup. The updated version also passed 6,000 error submissions, including 3,000 duplicate retries across three runs, without storing duplicate rows.
+
+[Results, raw timings, and test conditions](docs/performance.md). This is a synthetic backend benchmark, not production capacity or browser performance.
+
 ## Stack
 
 | Part | Choice |
@@ -138,4 +144,4 @@ The monitor only accepts hosts listed in `MONITOR_ALLOWED_HOSTS` and does not fo
 2. Move slow tasks to Celery and Redis, with bounded retries.
 3. Improve scheduling and retention once the basic workflow is stable.
 
-More detail: [API examples](docs/api.md) · [Implementation decisions](docs/implementation.md) · [PostgreSQL and Docker](docs/docker.md) · [Demo and verification](docs/demo.md) · [Project wording](docs/resume.md).
+More detail: [API examples](docs/api.md) · [Implementation decisions](docs/implementation.md) · [PostgreSQL and Docker](docs/docker.md) · [Demo and verification](docs/demo.md) · [Performance](docs/performance.md) · [Project wording](docs/resume.md).
