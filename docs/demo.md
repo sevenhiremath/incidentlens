@@ -28,7 +28,7 @@ The test suite covers backend behavior and Streamlit rendering. The PostgreSQL-o
 
 Local checks on 17 October 2026:
 
-- SQLite test run: **40 passed, 3 skipped**. The skipped cases require PostgreSQL.
+- SQLite test run: **42 passed, 3 skipped**. The skipped cases require PostgreSQL.
 - Ruff lint and formatting checks passed.
 - Django system checks and migration consistency checks passed.
 - The real HTTP walkthrough passed: one recovered incident, six linked events, duplicate error stored once, and two report revisions.

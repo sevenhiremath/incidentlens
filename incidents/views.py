@@ -36,6 +36,8 @@ class LoginView(APIView):
         return "Token"
 
     def post(self, request):
+        if not isinstance(request.data, dict):
+            raise ValidationError("Send a JSON object.")
         username = request.data.get("username", "")
         password = request.data.get("password", "")
         if not isinstance(username, str) or not isinstance(password, str):

@@ -11,6 +11,9 @@ from .security import validate_health_url
 class ServiceSerializer(serializers.ModelSerializer):
     health = serializers.SerializerMethodField()
     enabled = serializers.BooleanField(required=False, default=True)
+    # Django's default URL field rejects single-label Compose names such as "demo".
+    # Our explicit operator allowlist is used for these local monitoring targets.
+    health_url = serializers.CharField(max_length=500)
 
     class Meta:
         model = Service

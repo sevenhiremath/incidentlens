@@ -34,6 +34,11 @@ def test_bad_login_returns_generic_error(owner):
     assert "incorrect" in str(result.data)
 
 
+def test_malformed_login_returns_validation_error():
+    response = APIClient().post("/api/auth/login/", ["invalid"], format="json")
+    assert response.status_code == 400
+
+
 def test_unauthenticated_api_is_rejected():
     assert APIClient().get("/api/incidents/").status_code == 401
 
@@ -50,6 +55,18 @@ def test_service_registration_hides_keys(client):
     assert result.data["health"] == "unknown"
     assert "key_digest" not in result.data
     assert "owner" not in result.data
+
+
+def test_allowlisted_compose_hostname_can_be_registered(client):
+    response = client.post(
+        "/api/services/",
+        {
+            "name": "Container demo",
+            "health_url": "http://demo:5055/health",
+        },
+        format="json",
+    )
+    assert response.status_code == 201
 
 
 @pytest.mark.parametrize(

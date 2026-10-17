@@ -154,7 +154,12 @@ class RevisionConflict(Exception):
 
 @transaction.atomic
 def save_report(incident_id, user, *, request_id, expected_revision, content=None):
-    incident = Incident.objects.select_for_update().select_related("service").get(pk=incident_id)
+    # Lock the report's parent only. The monitor locks Service before Incident.
+    incident = (
+        Incident.objects.select_for_update(of=("self",))
+        .select_related("service")
+        .get(pk=incident_id)
+    )
     existing = incident.reports.filter(request_id=request_id).first()
     if existing:
         return existing, False

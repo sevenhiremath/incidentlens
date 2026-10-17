@@ -56,6 +56,8 @@ A draft includes actual event IDs and a bounded snapshot of up to 100 recent lin
 
 Each save includes an `expected_revision`. If someone has already saved a newer revision, the backend returns HTTP 409. Each save also has a request UUID; retrying that request returns the existing revision. The interface does not automatically retry writes yet.
 
+Saving a report locks its incident row, but not the joined service row. This avoids taking those two locks in the opposite order from the monitor.
+
 The snapshot does not change when more logs arrive. Build a new draft to include newer evidence. Editing the Markdown is a human action; the backend does not verify every claim or every manually typed citation.
 
 ## Authentication and local safety
