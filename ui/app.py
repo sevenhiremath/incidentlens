@@ -57,7 +57,7 @@ def show_service_table(services):
             for s in services
         ],
         hide_index=True,
-        use_container_width=True,
+        width="stretch",
     )
 
 
@@ -156,7 +156,7 @@ def show_incident_table(incidents):
             for i in incidents
         ],
         hide_index=True,
-        use_container_width=True,
+        width="stretch",
     )
 
 
