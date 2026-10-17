@@ -1,0 +1,59 @@
+name: Performance comparison
+
+on:
+  workflow_dispatch:
+    inputs:
+      baseline_ref:
+        description: Commit before the list-query optimization
+        required: true
+        default: "11469ce80705ab0fb7284c13e31514615e22837a"
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: incidentlens
+          POSTGRES_PASSWORD: ci-only-benchmark-password
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U incidentlens -d postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      POSTGRES_USER: incidentlens
+      POSTGRES_PASSWORD: ci-only-benchmark-password
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: "5432"
+      BASELINE_REF: ${{ inputs.baseline_ref }}
+      BENCHMARK_RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+      - run: uv sync --locked
+      - name: Prepare the baseline checkout
+        run: git worktree add --detach ../incidentlens-baseline "$BASELINE_REF"
+      - name: Measure baseline and candidate on the same runner
+        run: >-
+          uv run python benchmarks/run.py --baseline ../incidentlens-baseline
+          --candidate . --output local-artifacts/performance
+      - name: Add results to the run summary
+        run: cat local-artifacts/performance/summary.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: incidentlens-performance
+          path: local-artifacts/performance/

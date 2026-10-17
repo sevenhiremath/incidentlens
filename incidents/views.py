@@ -2,7 +2,7 @@ import secrets
 
 from django.contrib.auth import authenticate
 from django.db import IntegrityError, transaction
-from django.db.models import Q
+from django.db.models import Count, Exists, OuterRef, Q
 from django.shortcuts import get_object_or_404
 from django.utils.dateparse import parse_date
 from rest_framework import generics, status
@@ -59,7 +59,11 @@ class ServiceList(generics.ListCreateAPIView):
     serializer_class = ServiceSerializer
 
     def get_queryset(self):
-        return Service.objects.filter(owner=self.request.user).prefetch_related("incidents")
+        return Service.objects.filter(owner=self.request.user).annotate(
+            has_open_incident=Exists(
+                Incident.objects.filter(service_id=OuterRef("pk"), status=Incident.Status.OPEN)
+            )
+        )
 
     def perform_create(self, serializer):
         try:
@@ -147,8 +151,11 @@ class IncidentList(generics.ListAPIView):
     serializer_class = IncidentSerializer
 
     def get_queryset(self):
-        queryset = Incident.objects.filter(service__owner=self.request.user).select_related(
-            "service"
+        queryset = (
+            Incident.objects.filter(service__owner=self.request.user)
+            .select_related("service")
+            .annotate(event_count=Count("events"))
+            .order_by("-detected_at", "-id")
         )
         service = self.request.query_params.get("service")
         if service:
@@ -190,7 +197,12 @@ class IncidentDetail(generics.RetrieveUpdateAPIView):
     http_method_names = ["get", "patch", "head", "options"]
 
     def get_queryset(self):
-        return Incident.objects.filter(service__owner=self.request.user).select_related("service")
+        return (
+            Incident.objects.filter(service__owner=self.request.user)
+            .select_related("service")
+            .annotate(event_count=Count("events"))
+            .order_by("-detected_at", "-id")
+        )
 
     def perform_update(self, serializer):
         # Only editable fields are written, so a simultaneous recovery is preserved.

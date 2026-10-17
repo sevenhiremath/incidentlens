@@ -63,7 +63,10 @@ class ServiceSerializer(serializers.ModelSerializer):
             return "unknown"
         if (timezone.now() - obj.last_checked_at).total_seconds() > settings.MONITOR_STALE_SECONDS:
             return "stale"
-        if obj.incidents.filter(status=Incident.Status.OPEN).exists():
+        has_open_incident = getattr(obj, "has_open_incident", None)
+        if has_open_incident is None:
+            has_open_incident = obj.incidents.filter(status=Incident.Status.OPEN).exists()
+        if has_open_incident:
             return "down" if obj.last_check_ok is False else "recovering"
         return "healthy" if obj.last_check_ok else "suspected"
 
@@ -123,7 +126,7 @@ class IncidentSerializer(serializers.ModelSerializer):
     service_name = serializers.CharField(source="service.name", read_only=True)
     environment = serializers.CharField(source="service.environment", read_only=True)
     duration_seconds = serializers.SerializerMethodField()
-    event_count = serializers.IntegerField(source="events.count", read_only=True)
+    event_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Incident
