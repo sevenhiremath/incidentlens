@@ -24,6 +24,7 @@ from .serializers import (
     ReportSerializer,
     ServiceSerializer,
 )
+from .summary import summarize_checks
 
 
 class LoginView(APIView):
@@ -252,6 +253,21 @@ class ServiceEvents(generics.ListAPIView):
     def get_queryset(self):
         service = get_object_or_404(Service, pk=self.kwargs["pk"], owner=self.request.user)
         return service.events.order_by("-occurred_at", "-received_at")
+
+
+class ServiceSummary(APIView):
+    def get(self, request, pk):
+        service = get_object_or_404(Service, pk=pk, owner=request.user)
+        checks = (
+            service.events.filter(kind="check")
+            .order_by(
+                "-occurred_at",
+                "-received_at",
+                "-id",
+            )
+            .values("kind", "healthy", "latency_ms")[:100]
+        )
+        return Response({"sample_limit": 100, **summarize_checks(checks)})
 
 
 class HealthView(APIView):

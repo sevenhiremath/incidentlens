@@ -11,6 +11,7 @@ urlpatterns = [
     path("api/services/<uuid:pk>/key/", views.RotateKey.as_view()),
     path("api/services/<uuid:pk>/events/", views.IngestEvent.as_view()),
     path("api/services/<uuid:pk>/history/", views.ServiceEvents.as_view()),
+    path("api/services/<uuid:pk>/summary/", views.ServiceSummary.as_view()),
     path("api/incidents/", views.IncidentList.as_view()),
     path("api/incidents/<uuid:pk>/", views.IncidentDetail.as_view()),
     path("api/incidents/<uuid:pk>/events/", views.IncidentEvents.as_view()),

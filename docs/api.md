@@ -11,6 +11,7 @@ All dashboard endpoints need `Authorization: Token <user-token>`, except login a
 | POST | `/api/services/{id}/key/` | Create or rotate an ingestion key |
 | POST | `/api/services/{id}/events/` | Send an application error |
 | GET | `/api/services/{id}/history/` | Recent service events, newest first |
+| GET | `/api/services/{id}/summary/` | Success rate and latency across the latest 100 health checks |
 | GET | `/api/incidents/` | List and filter incidents |
 | GET, PATCH | `/api/incidents/{id}/` | View or update investigation notes |
 | GET | `/api/incidents/{id}/events/` | Timeline, oldest first |
@@ -46,6 +47,8 @@ service_id = response.json()["id"]
 ```
 
 The health endpoint cannot be changed after registration, because existing incident history belongs to that endpoint. Register a new service for a different endpoint. Other editable service fields are `name`, `environment`, and `enabled`.
+
+The summary endpoint ignores application error events and uses up to 100 health checks, selected by occurrence time. Its response includes `sample_limit`, `total_checks`, `healthy_checks`, `failed_checks`, `success_rate_percent`, and `average_latency_ms`. With no checks, both statistics are `null`. Missing latency values are excluded from the average, while zero is included. This is a sampled check success rate, not time-based uptime.
 
 ## Send an application error
 
