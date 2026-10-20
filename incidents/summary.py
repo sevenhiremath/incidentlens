@@ -28,8 +28,8 @@ def summarize_checks(events):
         }
 
     This is a check success rate, not time-based uptime. No Django, database,
-    network requests, or AI calls are needed. The function is not wired into
-    the dashboard yet; that can be the next step once it works.
+    network requests, or AI calls are needed inside this helper. The service
+    summary API uses it to provide statistics to the dashboard.
     """
     total_checks = 0
     healthy_checks = 0

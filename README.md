@@ -16,6 +16,7 @@ This screenshot is from the local walkthrough. The service shows stale because t
 
 - Log in, register services, and pause or resume monitoring.
 - Check health endpoints from a separate Python process.
+- View success rate, failed checks, and average response time for up to 100 recent health checks.
 - Open an incident after three failed checks and confirm recovery after two successful checks.
 - Receive application errors through a service-key protected API.
 - Ignore duplicate event IDs and attach relevant errors to an incident timeline.

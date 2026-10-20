@@ -76,6 +76,17 @@ def show_dashboard(services):
     show_incident_table(recent["results"])
     if services:
         selected = st.selectbox("Response history", services, format_func=service_label)
+        summary = request("GET", f"services/{selected['id']}/summary/")
+        st.caption(
+            f"Summary of the latest {summary['total_checks']} health checks "
+            f"(up to {summary['sample_limit']}). Success rate counts checks, not time-based uptime."
+        )
+        rate = summary["success_rate_percent"]
+        latency = summary["average_latency_ms"]
+        stats = st.columns(3)
+        stats[0].metric("Check success rate", f"{rate:.2f}%" if rate is not None else "—")
+        stats[1].metric("Failed checks", summary["failed_checks"])
+        stats[2].metric("Average response", f"{latency:.2f} ms" if latency is not None else "—")
         history = page(f"services/{selected['id']}/history/", st.session_state.token)["results"]
         checks = [
             {"Time (UTC)": e["occurred_at"], "Response time (ms)": e["latency_ms"]}
@@ -97,7 +108,7 @@ def show_dashboard(services):
             )
             st.altair_chart(chart, width="stretch")
         else:
-            st.caption("No health checks yet. Start the separate monitor process.")
+            st.caption("No health checks in the latest event page. Start the monitor if needed.")
     st.caption("Refresh to fetch current data. A missing monitor becomes STALE after 90 seconds.")
 
 
